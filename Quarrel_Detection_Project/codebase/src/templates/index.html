@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quarrel Detection System - Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0ea5e9;    /* Light Blue */
+            --primary-dark: #0284c7;    /* Darker Blue */
+            --accent-orange: #f97316;   /* Orange */
+            --success-green: #22c55e;   /* Green */
+            --danger-red: #ef4444;      /* Red */
+            --bg-light: #f8fafc;        /* Very Light Blue/Gray */
+            --text-dark: #1e293b;       /* Slate 800 */
+            --text-muted: #64748b;      /* Slate 500 */
+            --border-color: #e2e8f0;    /* Slate 200 */
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background-color: white !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 1rem 0;
+        }
+        
+        .brand-text {
+            color: var(--text-dark);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .brand-highlight {
+            color: var(--primary-blue);
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            background-color: white;
+            border-right: 1px solid var(--border-color);
+            min-height: calc(100vh - 76px);
+        }
+        
+        .nav-link {
+            color: var(--text-muted);
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.25rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-blue);
+            background-color: #f0f9ff;
+        }
+        
+        .nav-link.active {
+            color: white !important;
+            background-color: var(--primary-blue);
+            box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.2);
+        }
+
+        /* Card Styling */
+        .card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            border-color: var(--primary-blue);
+        }
+
+        /* Icon Backgrounds */
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .bg-blue-light { background-color: #e0f2fe; color: var(--primary-blue); }
+        .bg-green-light { background-color: #dcfce7; color: var(--success-green); }
+        .bg-orange-light { background-color: #ffedd5; color: var(--accent-orange); }
+        .bg-red-light { background-color: #fee2e2; color: var(--danger-red); }
+
+        /* Video Feed */
+        .video-container {
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            border: 4px solid white;
+        }
+
+        /* Buttons */
+        .btn-gradient {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-gradient:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.3);
+            color: white;
+        }
+
+        /* Text Utilities */
+        .text-primary { color: var(--primary-blue) !important; }
+        .text-success { color: var(--success-green) !important; }
+        .text-warning { color: var(--accent-orange) !important; }
+        .text-danger { color: var(--danger-red) !important; }
+        
+        /* Sliders */
+        input[type=range] {
+            accent-color: var(--primary-blue);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .pulse { animation: pulse 2s infinite; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <nav class="navbar sticky-top">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <i class="bi bi-shield-check text-primary fs-2 me-2"></i>
+                    <span class="fs-4 brand-text">
+                        <span class="brand-highlight">Quarrel</span> Detection
+                    </span>
+                </a>
+                <span class="badge bg-success px-3 py-2 rounded-pill shadow-sm" id="systemStatus">
+                    <i class="bi bi-check-circle me-1"></i>System Ready
+                </span>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <div class="p-3">
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active" data-tab="dashboard">
+                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-tab="detection">
+                                <i class="bi bi-camera-video me-2"></i>Live Detection
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-tab="settings">
+                                <i class="bi bi-gear me-2"></i>Settings
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <div class="card bg-blue-light border-0 mt-4">
+                        <div class="card-body text-center">
+                            <small class="text-uppercase fw-bold d-block mb-1" style="color: var(--primary-blue); font-size: 0.75rem;">System Uptime</small>
+                            <h5 class="fw-bold mb-0" style="color: var(--primary-dark);" id="uptime">00:00:00</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="col-md-9 col-lg-10">
+                <div class="p-4">
+                    <!-- Dashboard Tab -->
+                    <div class="tab-content active" id="dashboard-tab">
+                        <div class="mb-4">
+                            <h2 class="fw-bold mb-2">Dashboard Overview</h2>
+                            <p class="text-muted">Real-time monitoring and statistics</p>
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card stat-card h-100 border-0 shadow-sm">
+                                    <div class="card-body d-flex align-items-center">
+                                        <div class="icon-box bg-blue-light me-3">
+                                            <i class="bi bi-check-circle-fill fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted fw-bold d-block text-uppercase" style="font-size: 0.7rem;">Total</small>
+                                            <h3 class="mb-0 fw-bold" id="totalDetections">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card stat-card h-100 border-0 shadow-sm">
+                                    <div class="card-body d-flex align-items-center">
+                                        <div class="icon-box bg-green-light me-3">
+                                            <i class="bi bi-emoji-smile-fill fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted fw-bold d-block text-uppercase" style="font-size: 0.7rem;">Normal</small>
+                                            <h3 class="mb-0 fw-bold" id="normalCount">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card stat-card h-100 border-0 shadow-sm">
+                                    <div class="card-body d-flex align-items-center">
+                                        <div class="icon-box bg-red-light me-3">
+                                            <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted fw-bold d-block text-uppercase" style="font-size: 0.7rem;">Quarrels</small>
+                                            <h3 class="mb-0 fw-bold" id="quarrelCount">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card stat-card h-100 border-0 shadow-sm">
+                                    <div class="card-body d-flex align-items-center">
+                                        <div class="icon-box bg-orange-light me-3">
+                                            <i class="bi bi-speedometer fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted fw-bold d-block text-uppercase" style="font-size: 0.7rem;">FPS</small>
+                                            <h3 class="mb-0 fw-bold" id="fpsValue">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Current Status -->
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4">Current Status</h5>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Detection Status</small>
+                                        <h6 id="detectionStatus" class="text-success">Normal</h6>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Confidence</small>
+                                        <h6 id="confidenceValue">0%</h6>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Person Count</small>
+                                        <h6 id="personCount">0</h6>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Last Update</small>
+                                        <h6 id="lastUpdate">--:--:--</h6>
+                                    </div>
+                                </div>
+
+                                <!-- Score Bars -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small>CNN Score</small>
+                                        <small id="cnnScoreText">0%</small>
+                                    </div>
+                                    <div class="progress" style="height: 10px; background-color: #f1f5f9;">
+                                        <div class="progress-bar bg-primary" id="cnnProgress" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small>Motion Score</small>
+                                        <small id="motionScoreText">0%</small>
+                                    </div>
+                                    <div class="progress" style="height: 10px; background-color: #f1f5f9;">
+                                        <div class="progress-bar bg-success" id="motionProgress" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small>Audio Score</small>
+                                        <small id="audioScoreText">0%</small>
+                                    </div>
+                                    <div class="progress" style="height: 10px; background-color: #f1f5f9;">
+                                        <div class="progress-bar bg-info" id="audioProgress" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="fw-bold">Combined Score</small>
+                                        <small class="fw-bold" id="combinedScoreText">0%</small>
+                                    </div>
+                                    <div class="progress" style="height: 12px; background-color: #f1f5f9;">
+                                        <div class="progress-bar" id="combinedProgress" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detection Tab -->
+                    <div class="tab-content" id="detection-tab" style="display: none;">
+                        <div class="mb-4">
+                            <h2 class="fw-bold mb-2">Live Detection</h2>
+                            <p class="text-muted">Real-time video feed and analysis</p>
+                        </div>
+
+                        <div class="video-container mb-4 shadow-lg">
+                            <img src="{{ url_for('video_feed') }}" alt="Live Video Feed" class="video-feed">
+                            <div class="video-overlay" id="videoOverlay">
+                                <div class="text-center">
+                                    <i class="bi bi-camera-video-off fs-1 pulse mb-3"></i>
+                                    <h5>System Inactive</h5>
+                                    <p class="text-muted">Click Start Detection to begin</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-center flex-wrap">
+                            <button class="btn btn-gradient btn-lg" id="startBtn">
+                                <i class="bi bi-play-fill me-2"></i>Start Detection
+                            </button>
+                            <button class="btn btn-outline-secondary btn-lg" id="stopBtn" disabled>
+                                <i class="bi bi-stop-fill me-2"></i>Stop Detection
+                            </button>
+                            <button class="btn btn-outline-info btn-lg" id="snapshotBtn">
+                                <i class="bi bi-camera-fill me-2"></i>Save Snapshot
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                    <div class="tab-content" id="settings-tab" style="display: none;">
+                        <div class="mb-4">
+                            <h2 class="fw-bold mb-2">System Settings</h2>
+                            <p class="text-muted">Configure detection parameters</p>
+                        </div>
+
+                        <div class="card stat-card" style="max-width: 800px;">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4">Detection Threshold</h5>
+                                <div class="mb-4">
+                                    <label class="form-label d-flex justify-content-between">
+                                        <span>Quarrel Detection Threshold</span>
+                                        <span class="text-primary fw-bold" id="thresholdValue">0.60</span>
+                                    </label>
+                                    <input type="range" class="form-range" id="thresholdSlider" min="0" max="1" step="0.05" value="0.60">
+                                    <small class="text-muted">Higher values = fewer false positives, but may miss some quarrels</small>
+                                </div>
+
+                                <h5 class="card-title mb-4 mt-5">Fusion Weights</h5>
+                                <div class="mb-4">
+                                    <label class="form-label d-flex justify-content-between">
+                                        <span>CNN Weight</span>
+                                        <span class="text-primary fw-bold" id="cnnWeightValue">0.50</span>
+                                    </label>
+                                    <input type="range" class="form-range" id="cnnWeightSlider" min="0" max="1" step="0.05" value="0.50">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label d-flex justify-content-between">
+                                        <span>Motion Weight</span>
+                                        <span class="text-primary fw-bold" id="motionWeightValue">0.30</span>
+                                    </label>
+                                    <input type="range" class="form-range" id="motionWeightSlider" min="0" max="1" step="0.05" value="0.30">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label d-flex justify-content-between">
+                                        <span>Audio Weight</span>
+                                        <span class="text-primary fw-bold" id="audioWeightValue">0.20</span>
+                                    </label>
+                                    <input type="range" class="form-range" id="audioWeightSlider" min="0" max="1" step="0.05" value="0.20">
+                                </div>
+
+                                <button class="btn btn-gradient btn-lg w-100" id="saveConfigBtn">
+                                    <i class="bi bi-save me-2"></i>Save Configuration
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

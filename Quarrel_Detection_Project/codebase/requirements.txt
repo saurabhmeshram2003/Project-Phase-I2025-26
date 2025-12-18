@@ -1,0 +1,28 @@
+# Core Dependencies
+opencv-python>=4.8.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+pillow>=10.0.0
+
+# Deep Learning & Computer Vision
+# Note: TensorFlow 2.16+ works on Apple Silicon M1/M2/M3
+# Use: pip install tensorflow==2.16.1 (not tensorflow-macos)
+tensorflow>=2.16.0
+scikit-learn>=1.3.0
+seaborn>=0.13.0  # For confusion matrix visualization
+pandas>=1.2.0    # For model comparison data handling
+
+# Person Detection (Commercial-Friendly)
+# Using MobileNet-SSD via OpenCV DNN module (Apache 2.0 license)
+# Models auto-downloaded on first run
+
+# Audio Processing - DISABLED by default (causes segfaults)
+# System will work without audio analysis (visual-only mode)
+# To enable: brew install portaudio && pip install pyaudio
+scipy>=1.10.0
+
+# Web Interface
+flask>=2.3.0
+
+# Utilities
+tqdm>=4.65.0
