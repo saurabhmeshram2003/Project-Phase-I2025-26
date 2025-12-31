@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tester Dashboard - BugTracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0b1020;
+            --panel: #0f1528;
+            --muted: #9aa3b2;
+            --text: #e6ecf5;
+            --brand: #6aa6ff;
+            --brand-2: #8b5cf6;
+            --ok: #22c55e;
+            --warn: #f59e0b;
+            --danger: #ef4444;
+            --radius: 16px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--panel);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+        }
+        
+        .sidebar-logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .user-details h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .user-details p {
+            font-size: 12px;
+            color: var(--muted);
+        }
+        
+        .nav-menu {
+            flex: 1;
+            padding: 0 10px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--muted);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(106, 166, 255, 0.1);
+            color: var(--brand);
+        }
+        
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--danger);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .report-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .report-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(106, 166, 255, 0.3);
+        }
+        
+        .notification-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--panel);
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stat-title {
+            font-size: 14px;
+            color: var(--muted);
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .icon-reported {
+            background: rgba(106, 166, 255, 0.1);
+            color: var(--brand);
+        }
+        
+        .icon-open {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warn);
+        }
+        
+        .icon-resolved {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--ok);
+        }
+        
+        .icon-closed {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--brand-2);
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .change-positive {
+            color: var(--ok);
+        }
+        
+        .change-negative {
+            color: var(--danger);
+        }
+        
+        /* Filters and Actions */
+        .filters-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+        
+        .filter-btn.active, .filter-btn:hover {
+            background: rgba(106, 166, 255, 0.1);
+            color: var(--brand);
+            border-color: var(--brand);
+        }
+        
+        .view-options {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .view-option {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .view-option.active, .view-option:hover {
+            background: rgba(106, 166, 255, 0.1);
+            color: var(--brand);
+            border-color: var(--brand);
+        }
+        
+        /* Bugs List */
+        .bugs-list {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .bug-card {
+            background: var(--panel);
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .bug-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: rgba(106, 166, 255, 0.2);
+        }
+        
+        .bug-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .bug-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .bug-id {
+            color: var(--muted);
+            font-size: 14px;
+        }
+        
+        .bug-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-open {
+            background: rgba(106, 166, 255, 0.1);
+            color: var(--brand);
+        }
+        
+        .status-progress {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warn);
+        }
+        
+        .status-resolved {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--ok);
+        }
+        
+        .status-closed {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--brand-2);
+        }
+        
+        .bug-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .bug-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+        
+        .bug-priority {
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .priority-high {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .priority-medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warn);
+        }
+        
+        .priority-low {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--ok);
+        }
+        
+        .bug-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .bug-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-comment {
+            background: rgba(106, 166, 255, 0.1);
+            color: var(--brand);
+        }
+        
+        .btn-comment:hover {
+            background: rgba(106, 166, 255, 0.2);
+        }
+        
+        .btn-view {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--muted);
+        }
+        
+        .btn-view:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .btn-reopen {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warn);
+        }
+        
+        .btn-reopen:hover {
+            background: rgba(245, 158, 11, 0.2);
+        }
+        
+        .assignee-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+        
+        .assignee-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Charts Section */
+        .charts-section {
+            background: var(--panel);
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 200px;
+            width: 100%;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar-logo-text, .user-details, .nav-text {
+                display: none;
+            }
+            
+            .sidebar-header {
+                padding: 15px 10px;
+            }
+            
+            .sidebar-logo {
+                justify-content: center;
+            }
+            
+            .user-info {
+                justify-content: center;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .bug-card-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .bug-card-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .bug-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">BT</div>
+                    <div class="sidebar-logo-text">BugTracker</div>
+                </div>
+                
+                <div class="user-info">
+                    <div class="user-avatar">MT</div>
+                    <div class="user-details">
+                        <h3>Mike Tester</h3>
+                        <p>Tester</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-menu">
+                <a href="tester-dashboard.html" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="Bug-Detail-Page.html" class="nav-item">
+                    <i class="fas fa-bug"></i>
+                    <span class="nav-text">Reported Bugs</span>
+                </a>
+                <a href="test-cases.html" class="nav-item">
+                    <i class="fas fa-list"></i>
+                    <span class="nav-text">Test Cases</span>
+                </a>
+                <a href="tester-reports.html" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="nav-text">Reports</span>
+                </a>
+
+            </div>
+            
+            <div class="sidebar-footer">
+                <a href="landing.html" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="page-title">Tester Dashboard</h1>
+                
+                <div class="header-actions">
+                    <a href="/report-bug" class="report-btn">
+                        <i class="fas fa-plus"></i>
+                        Report New Bug
+                    </a>
+                    <button class="notification-btn" onclick="showNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">5</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Total Reported</div>
+                        <div class="stat-icon icon-reported">
+                            <i class="fas fa-bug"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">{{ stats.total_reported }}</div>
+                    <div class="stat-change change-positive">
+                        <i class="fas fa-arrow-up"></i> Active bugs
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Open Bugs</div>
+                        <div class="stat-icon icon-open">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">{{ stats.open }}</div>
+                    <div class="stat-change change-negative">
+                        <i class="fas fa-arrow-up"></i> Need attention
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Resolved</div>
+                        <div class="stat-icon icon-resolved">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">{{ stats.resolved }}</div>
+                    <div class="stat-change change-positive">
+                        <i class="fas fa-arrow-up"></i> This month
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">System Total</div>
+                        <div class="stat-icon icon-closed">
+                            <i class="fas fa-archive"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">{{ stats.total_system }}</div>
+                    <div class="stat-change change-positive">
+                        <i class="fas fa-arrow-up"></i> All bugs
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filters and Actions -->
+            <div class="filters-actions">
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterBugs('all')">All Bugs</button>
+                    <button class="filter-btn" onclick="filterBugs('open')">Open</button>
+                    <button class="filter-btn" onclick="filterBugs('in progress')">In Progress</button>
+                    <button class="filter-btn" onclick="filterBugs('resolved')">Resolved</button>
+                    <button class="filter-btn" onclick="filterBugs('closed')">Closed</button>
+                </div>
+                
+                <div class="view-options">
+                    <button class="view-option active" onclick="setView('list')">
+                        <i class="fas fa-list"></i>
+                    </button>
+                    <button class="view-option" onclick="setView('grid')">
+                        <i class="fas fa-grip-vertical"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Bugs List -->
+            <div class="bugs-list">
+                {% for bug in all_bugs %}
+                <div class="bug-card">
+                    <div class="bug-card-header">
+                        <div>
+                            <h3 class="bug-title">{{ bug.title }}</h3>
+                            <div class="bug-id">#{{ bug._id }}</div>
+                        </div>
+                        <div class="bug-status status-{{ bug.status.lower().replace(' ', '-') }}">{{ bug.status }}</div>
+                    </div>
+
+                    <p>{{ bug.description[:150] }}{% if bug.description|length > 150 %}...{% endif %}</p>
+
+                    <div class="bug-meta">
+                        <div class="bug-meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span class="bug-priority priority-{{ bug.priority.lower() }}">{{ bug.priority }} Priority</span>
+                        </div>
+                        <div class="bug-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Created: {{ bug.created_at.strftime('%b %d, %Y') }}</span>
+                        </div>
+                        <div class="bug-meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Updated: {{ bug.updated_at.strftime('%b %d, %Y') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="bug-card-footer">
+                        <div class="bug-actions">
+                            <a href="/bug/{{ bug._id }}" class="action-btn btn-comment">
+                                <i class="fas fa-comment"></i> View Details
+                            </a>
+                            <a href="/bug/{{ bug._id }}" class="action-btn btn-view">
+                                <i class="fas fa-eye"></i> Details
+                            </a>
+                        </div>
+                        <div class="assignee-info">
+                            <div class="assignee-avatar">{{ bug.assigned_to[0].upper() if bug.assigned_to else 'U' }}</div>
+                            <span>{{ bug.assigned_to if bug.assigned_to else 'Unassigned' }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="section-header">
+                    <h2 class="section-title">Bug Reports Overview</h2>
+                    <a href="tester-reports.html" class="view-all">View Full Report</a>
+                </div>
+                
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global functions for button onclick handlers
+        function filterBugs(filterType) {
+            // Input validation
+            if (!filterType || typeof filterType !== 'string') {
+                console.error('Invalid filter type provided');
+                return;
+            }
+
+            // Validate filter type against allowed values
+            const validFilters = ['all', 'open', 'in progress', 'resolved', 'closed'];
+            if (!validFilters.includes(filterType)) {
+                console.error('Invalid filter type:', filterType);
+                alert('Invalid filter selection. Please try again.');
+                return;
+            }
+
+            // Update button states with validation
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            if (!filterButtons.length) {
+                console.error('Filter buttons not found');
+                return;
+            }
+
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+
+            // Get bug cards with validation
+            const bugCards = document.querySelectorAll('.bug-card');
+            if (!bugCards.length) {
+                console.warn('No bug cards found to filter');
+                return;
+            }
+
+            let visibleCount = 0;
+            let totalCount = bugCards.length;
+
+            // Apply filtering with enhanced logic
+            bugCards.forEach(card => {
+                const statusElement = card.querySelector('.bug-status');
+                if (!statusElement) {
+                    console.warn('Bug card missing status element');
+                    card.style.display = 'none';
+                    return;
+                }
+
+                const bugStatus = statusElement.textContent.trim().toLowerCase();
+                let showCard = false;
+
+                // Enhanced filtering logic with better status matching
+                switch(filterType) {
+                    case 'all':
+                        showCard = true;
+                        break;
+                    case 'open':
+                        showCard = bugStatus === 'open';
+                        break;
+                    case 'in progress':
+                        showCard = bugStatus === 'in progress' || bugStatus === 'progress';
+                        break;
+                    case 'resolved':
+                        showCard = bugStatus === 'resolved';
+                        break;
+                    case 'closed':
+                        showCard = bugStatus === 'closed';
+                        break;
+                    default:
+                        showCard = true; // fallback to show all
+                }
+
+                card.style.display = showCard ? 'block' : 'none';
+                if (showCard) visibleCount++;
+            });
+
+            // Update stats display if available
+            updateFilterStats(filterType, visibleCount, totalCount);
+
+            // Provide user feedback
+            console.log(`Filtered by ${filterType}: showing ${visibleCount} of ${totalCount} bugs`);
+
+            // Show message if no results
+            const noResultsMsg = document.getElementById('noResultsMessage');
+            if (visibleCount === 0 && filterType !== 'all') {
+                if (!noResultsMsg) {
+                    const message = document.createElement('div');
+                    message.id = 'noResultsMessage';
+                    message.style.cssText = `
+                        text-align: center;
+                        padding: 20px;
+                        color: var(--muted);
+                        font-style: italic;
+                    `;
+                    message.textContent = `No ${filterType} bugs found. Try selecting "All Bugs" to see all items.`;
+                    document.querySelector('.bugs-list').appendChild(message);
+                }
+            } else if (noResultsMsg) {
+                noResultsMsg.remove();
+            }
+        }
+
+        function setView(viewType) {
+            // Input validation
+            if (!viewType || typeof viewType !== 'string') {
+                console.error('Invalid view type provided');
+                return;
+            }
+
+            // Validate view type
+            const validViews = ['list', 'grid'];
+            if (!validViews.includes(viewType)) {
+                console.error('Invalid view type:', viewType);
+                alert('Invalid view selection. Please try again.');
+                return;
+            }
+
+            // Update button states with validation
+            const viewOptions = document.querySelectorAll('.view-option');
+            if (!viewOptions.length) {
+                console.error('View option buttons not found');
+                return;
+            }
+
+            viewOptions.forEach(opt => opt.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+
+            // Get bugs list container with validation
+            const bugsList = document.querySelector('.bugs-list');
+            if (!bugsList) {
+                console.error('Bugs list container not found');
+                return;
+            }
+
+            // Apply view changes with enhanced styling
+            if (viewType === 'grid') {
+                bugsList.style.display = 'grid';
+                bugsList.style.gridTemplateColumns = 'repeat(auto-fit, minmax(350px, 1fr))';
+                bugsList.style.gap = '20px';
+
+                // Add grid-specific styling
+                const bugCards = bugsList.querySelectorAll('.bug-card');
+                bugCards.forEach(card => {
+                    card.style.maxWidth = 'none';
+                    card.style.width = '100%';
+                });
+
+                console.log('Switched to grid view');
+            } else if (viewType === 'list') {
+                bugsList.style.display = 'grid';
+                bugsList.style.gridTemplateColumns = '1fr';
+                bugsList.style.gap = '15px';
+
+                // Reset grid-specific styling
+                const bugCards = bugsList.querySelectorAll('.bug-card');
+                bugCards.forEach(card => {
+                    card.style.maxWidth = '';
+                    card.style.width = '';
+                });
+            }
+
+            // Store view preference (for demo purposes)
+            localStorage.setItem('bugTrackerView', viewType);
+
+            // Provide user feedback
+            showViewChangeNotification(viewType);
+        }
+
+        function showNotifications() {
+            // Get notification button
+            const notificationBtn = event ? event.target : document.querySelector('.notification-btn');
+            if (!notificationBtn) {
+                console.error('Notification button not found');
+                return;
+            }
+
+            // Create or toggle notification dropdown
+            let notificationDropdown = document.getElementById('notificationDropdown');
+
+            if (notificationDropdown) {
+                // Toggle visibility
+                notificationDropdown.style.display = notificationDropdown.style.display === 'none' ? 'block' : 'none';
+                return;
+            }
+
+            // Create notification dropdown
+            notificationDropdown = document.createElement('div');
+            notificationDropdown.id = 'notificationDropdown';
+            notificationDropdown.style.cssText = `
+                position: absolute;
+                top: 50px;
+                right: 0;
+                width: 350px;
+                background: var(--panel);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                max-height: 400px;
+                overflow-y: auto;
+            `;
+
+            // Sample notifications data
+            const notifications = [
+                {
+                    id: 1,
+                    type: 'update',
+                    title: 'Bug #BUG-123 Updated',
+                    message: 'Status changed to "In Progress"',
+                    time: '2 hours ago',
+                    read: false
+                },
+                {
+                    id: 2,
+                    type: 'comment',
+                    title: 'New Comment on Bug #BUG-122',
+                    message: 'John Developer added a comment',
+                    time: '4 hours ago',
+                    read: false
+                },
+                {
+                    id: 3,
+                    type: 'test',
+                    title: 'Test Case #TC-001 Failed',
+                    message: 'Payment gateway test failed',
+                    time: '1 day ago',
+                    read: true
+                },
+                {
+                    id: 4,
+                    type: 'resolved',
+                    title: 'Bug #BUG-119 Resolved',
+                    message: 'Pagination issue has been fixed',
+                    time: '2 days ago',
+                    read: true
+                },
+                {
+                    id: 5,
+                    type: 'report',
+                    title: 'Weekly Report Available',
+                    message: 'Your weekly testing summary is ready',
+                    time: '3 days ago',
+                    read: true
+                }
+            ];
+
+            // Create dropdown header
+            const header = document.createElement('div');
+            header.style.cssText = `
+                padding: 15px 20px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                font-weight: 600;
+                font-size: 16px;
+            `;
+            header.textContent = 'Notifications';
+            notificationDropdown.appendChild(header);
+
+            // Create notification items
+            notifications.forEach(notification => {
+                const item = document.createElement('div');
+                item.style.cssText = `
+                    padding: 15px 20px;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                    cursor: pointer;
+                    transition: background-color 0.2s;
+                    ${!notification.read ? 'background: rgba(106, 166, 255, 0.05);' : ''}
+                `;
+                item.onmouseover = () => item.style.background = 'rgba(255, 255, 255, 0.05)';
+                item.onmouseout = () => item.style.background = notification.read ? 'transparent' : 'rgba(106, 166, 255, 0.05)';
+
+                item.innerHTML = `
+                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                        <div style="width: 8px; height: 8px; border-radius: 50%; background: ${getNotificationColor(notification.type)}; flex-shrink: 0; margin-top: 6px;"></div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">${notification.title}</div>
+                            <div style="color: var(--muted); font-size: 13px; margin-bottom: 4px;">${notification.message}</div>
+                            <div style="color: var(--muted); font-size: 12px;">${notification.time}</div>
+                        </div>
+                    </div>
+                `;
+
+                item.onclick = () => handleNotificationClick(notification);
+                notificationDropdown.appendChild(item);
+            });
+
+            // Add to notification button container
+            const notificationContainer = notificationBtn.parentNode;
+            notificationContainer.style.position = 'relative';
+            notificationContainer.appendChild(notificationDropdown);
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!notificationContainer.contains(e.target)) {
+                    notificationDropdown.style.display = 'none';
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+
+            // Update notification badge
+            updateNotificationBadge(notifications.filter(n => !n.read).length);
+        }
+
+        // Initialize charts and other DOM ready functions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Status Chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Open', 'In Progress', 'Resolved', 'Closed'],
+                    datasets: [{
+                        data: [14, 8, 12, 8],
+                        backgroundColor: [
+                            '#6aa6ff',
+                            '#f59e0b',
+                            '#22c55e',
+                            '#8b5cf6'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            // Trend Chart
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Bugs Reported',
+                        data: [8, 12, 10, 14, 16, 18],
+                        borderColor: '#6aa6ff',
+                        backgroundColor: 'rgba(106, 166, 255, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+                if (!filterType || typeof filterType !== 'string') {
+                    console.error('Invalid filter type provided');
+                    return;
+                }
+
+                // Validate filter type against allowed values
+                const validFilters = ['all', 'open', 'in progress', 'resolved', 'closed'];
+                if (!validFilters.includes(filterType)) {
+                    console.error('Invalid filter type:', filterType);
+                    alert('Invalid filter selection. Please try again.');
+                    return;
+                }
+
+                // Update button states with validation
+                const filterButtons = document.querySelectorAll('.filter-btn');
+                if (!filterButtons.length) {
+                    console.error('Filter buttons not found');
+                    return;
+                }
+
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                if (event && event.target) {
+                    event.target.classList.add('active');
+                }
+
+                // Get bug cards with validation
+                const bugCards = document.querySelectorAll('.bug-card');
+                if (!bugCards.length) {
+                    console.warn('No bug cards found to filter');
+                    return;
+                }
+
+                let visibleCount = 0;
+                let totalCount = bugCards.length;
+
+                // Apply filtering with enhanced logic
+                bugCards.forEach(card => {
+                    const statusElement = card.querySelector('.bug-status');
+                    if (!statusElement) {
+                        console.warn('Bug card missing status element');
+                        card.style.display = 'none';
+                        return;
+                    }
+
+                    const bugStatus = statusElement.textContent.trim().toLowerCase();
+                    let showCard = false;
+
+                    // Enhanced filtering logic with better status matching
+                    switch(filterType) {
+                        case 'all':
+                            showCard = true;
+                            break;
+                        case 'open':
+                            showCard = bugStatus === 'open';
+                            break;
+                        case 'in progress':
+                            showCard = bugStatus === 'in progress' || bugStatus === 'progress';
+                            break;
+                        case 'resolved':
+                            showCard = bugStatus === 'resolved';
+                            break;
+                        case 'closed':
+                            showCard = bugStatus === 'closed';
+                            break;
+                        default:
+                            showCard = true; // fallback to show all
+                    }
+
+                    card.style.display = showCard ? 'block' : 'none';
+                    if (showCard) visibleCount++;
+                });
+
+                // Update stats display if available
+                updateFilterStats(filterType, visibleCount, totalCount);
+
+                // Provide user feedback
+                console.log(`Filtered by ${filterType}: showing ${visibleCount} of ${totalCount} bugs`);
+
+                // Show message if no results
+                const noResultsMsg = document.getElementById('noResultsMessage');
+                if (visibleCount === 0 && filterType !== 'all') {
+                    if (!noResultsMsg) {
+                        const message = document.createElement('div');
+                        message.id = 'noResultsMessage';
+                        message.style.cssText = `
+                            text-align: center;
+                            padding: 20px;
+                            color: var(--muted);
+                            font-style: italic;
+                        `;
+                        message.textContent = `No ${filterType} bugs found. Try selecting "All Bugs" to see all items.`;
+                        document.querySelector('.bugs-list').appendChild(message);
+                    }
+                } else if (noResultsMsg) {
+                    noResultsMsg.remove();
+                }
+            }
+
+            // Update filter statistics
+            function updateFilterStats(filterType, visibleCount, totalCount) {
+                // Update stat cards to reflect filtered view
+                const statCards = document.querySelectorAll('.stat-card');
+                statCards.forEach(card => {
+                    const title = card.querySelector('.stat-title').textContent.toLowerCase();
+                    const valueElement = card.querySelector('.stat-value');
+
+                    if (title.includes('total reported') && filterType !== 'all') {
+                        // Show filtered count
+                        const originalValue = valueElement.textContent;
+                        valueElement.setAttribute('data-original', originalValue);
+                        valueElement.textContent = visibleCount;
+                        valueElement.style.color = 'var(--brand)';
+                    } else if (title.includes('total reported') && filterType === 'all') {
+                        // Restore original count
+                        const originalValue = valueElement.getAttribute('data-original') || totalCount;
+                        valueElement.textContent = originalValue;
+                        valueElement.style.color = '';
+                    }
+                });
+            }
+            
+            // Enhanced View options with validation
+            function setView(viewType) {
+                // Input validation
+                if (!viewType || typeof viewType !== 'string') {
+                    console.error('Invalid view type provided');
+                    return;
+                }
+
+                // Validate view type
+                const validViews = ['list', 'grid'];
+                if (!validViews.includes(viewType)) {
+                    console.error('Invalid view type:', viewType);
+                    alert('Invalid view selection. Please try again.');
+                    return;
+                }
+
+                // Update button states with validation
+                const viewOptions = document.querySelectorAll('.view-option');
+                if (!viewOptions.length) {
+                    console.error('View option buttons not found');
+                    return;
+                }
+
+                viewOptions.forEach(opt => opt.classList.remove('active'));
+                if (event && event.target) {
+                    event.target.classList.add('active');
+                }
+
+                // Get bugs list container with validation
+                const bugsList = document.querySelector('.bugs-list');
+                if (!bugsList) {
+                    console.error('Bugs list container not found');
+                    return;
+                }
+
+                // Apply view changes with enhanced styling
+                if (viewType === 'grid') {
+                    bugsList.style.display = 'grid';
+                    bugsList.style.gridTemplateColumns = 'repeat(auto-fit, minmax(350px, 1fr))';
+                    bugsList.style.gap = '20px';
+
+                    // Add grid-specific styling
+                    const bugCards = bugsList.querySelectorAll('.bug-card');
+                    bugCards.forEach(card => {
+                        card.style.maxWidth = 'none';
+                        card.style.width = '100%';
+                    });
+
+                    console.log('Switched to grid view');
+                } else if (viewType === 'list') {
+                    bugsList.style.display = 'grid';
+                    bugsList.style.gridTemplateColumns = '1fr';
+                    bugsList.style.gap = '15px';
+
+                    // Reset grid-specific styling
+                    const bugCards = bugsList.querySelectorAll('.bug-card');
+                    bugCards.forEach(card => {
+                        card.style.maxWidth = '';
+                        card.style.width = '';
+                    });
+
+                    console.log('Switched to list view');
+                }
+
+                // Store view preference (for demo purposes)
+                localStorage.setItem('bugTrackerView', viewType);
+
+                // Provide user feedback
+                showViewChangeNotification(viewType);
+            }
+
+            // Show view change notification
+            function showViewChangeNotification(viewType) {
+                // Remove existing notification if any
+                const existingNotification = document.getElementById('viewChangeNotification');
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+
+                // Create new notification
+                const notification = document.createElement('div');
+                notification.id = 'viewChangeNotification';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--brand);
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    z-index: 1000;
+                    box-shadow: 0 4px 12px rgba(106, 166, 255, 0.3);
+                    animation: slideIn 0.3s ease-out;
+                `;
+                notification.textContent = `Switched to ${viewType} view`;
+
+                document.body.appendChild(notification);
+
+                // Add animation keyframes if not already present
+                if (!document.getElementById('viewNotificationStyles')) {
+                    const styles = document.createElement('style');
+                    styles.id = 'viewNotificationStyles';
+                    styles.textContent = `
+                        @keyframes slideIn {
+                            from { transform: translateX(100%); opacity: 0; }
+                            to { transform: translateX(0); opacity: 1; }
+                        }
+                    `;
+                    document.head.appendChild(styles);
+                }
+
+                // Auto-remove after 3 seconds
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.style.animation = 'slideIn 0.3s ease-in reverse';
+                        setTimeout(() => notification.remove(), 300);
+                    }
+                }, 3000);
+            }
+            
+            // Reopen button functionality
+            const reopenButtons = document.querySelectorAll('.btn-reopen');
+            reopenButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const statusElement = this.closest('.bug-card').querySelector('.bug-status');
+                    statusElement.textContent = 'Open';
+                    statusElement.className = 'bug-status status-open';
+                    
+                    this.innerHTML = '<i class="fas fa-comment"></i> Add Comment';
+                    this.className = 'action-btn btn-comment';
+                    
+                    // Show success message
+                    alert('Bug has been reopened successfully!');
+                });
+            });
+            
+            // Report new bug button - navigation handled by href attribute
+
+            // Enhanced Notification function with validation
+            function showNotifications() {
+                // Get notification button
+                const notificationBtn = event ? event.target : document.querySelector('.notification-btn');
+                if (!notificationBtn) {
+                    console.error('Notification button not found');
+                    return;
+                }
+
+                // Create or toggle notification dropdown
+                let notificationDropdown = document.getElementById('notificationDropdown');
+
+                if (notificationDropdown) {
+                    // Toggle visibility
+                    notificationDropdown.style.display = notificationDropdown.style.display === 'none' ? 'block' : 'none';
+                    return;
+                }
+
+                // Create notification dropdown
+                notificationDropdown = document.createElement('div');
+                notificationDropdown.id = 'notificationDropdown';
+                notificationDropdown.style.cssText = `
+                    position: absolute;
+                    top: 50px;
+                    right: 0;
+                    width: 350px;
+                    background: var(--panel);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 12px;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                    z-index: 1000;
+                    max-height: 400px;
+                    overflow-y: auto;
+                `;
+
+                // Sample notifications data
+                const notifications = [
+                    {
+                        id: 1,
+                        type: 'update',
+                        title: 'Bug #BUG-123 Updated',
+                        message: 'Status changed to "In Progress"',
+                        time: '2 hours ago',
+                        read: false
+                    },
+                    {
+                        id: 2,
+                        type: 'comment',
+                        title: 'New Comment on Bug #BUG-122',
+                        message: 'John Developer added a comment',
+                        time: '4 hours ago',
+                        read: false
+                    },
+                    {
+                        id: 3,
+                        type: 'test',
+                        title: 'Test Case #TC-001 Failed',
+                        message: 'Payment gateway test failed',
+                        time: '1 day ago',
+                        read: true
+                    },
+                    {
+                        id: 4,
+                        type: 'resolved',
+                        title: 'Bug #BUG-119 Resolved',
+                        message: 'Pagination issue has been fixed',
+                        time: '2 days ago',
+                        read: true
+                    },
+                    {
+                        id: 5,
+                        type: 'report',
+                        title: 'Weekly Report Available',
+                        message: 'Your weekly testing summary is ready',
+                        time: '3 days ago',
+                        read: true
+                    }
+                ];
+
+                // Create dropdown header
+                const header = document.createElement('div');
+                header.style.cssText = `
+                    padding: 15px 20px;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    font-weight: 600;
+                    font-size: 16px;
+                `;
+                header.textContent = 'Notifications';
+                notificationDropdown.appendChild(header);
+
+                // Create notification items
+                notifications.forEach(notification => {
+                    const item = document.createElement('div');
+                    item.style.cssText = `
+                        padding: 15px 20px;
+                        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                        cursor: pointer;
+                        transition: background-color 0.2s;
+                        ${!notification.read ? 'background: rgba(106, 166, 255, 0.05);' : ''}
+                    `;
+                    item.onmouseover = () => item.style.background = 'rgba(255, 255, 255, 0.05)';
+                    item.onmouseout = () => item.style.background = notification.read ? 'transparent' : 'rgba(106, 166, 255, 0.05)';
+
+                    item.innerHTML = `
+                        <div style="display: flex; align-items: flex-start; gap: 12px;">
+                            <div style="width: 8px; height: 8px; border-radius: 50%; background: ${getNotificationColor(notification.type)}; flex-shrink: 0; margin-top: 6px;"></div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">${notification.title}</div>
+                                <div style="color: var(--muted); font-size: 13px; margin-bottom: 4px;">${notification.message}</div>
+                                <div style="color: var(--muted); font-size: 12px;">${notification.time}</div>
+                            </div>
+                        </div>
+                    `;
+
+                    item.onclick = () => handleNotificationClick(notification);
+                    notificationDropdown.appendChild(item);
+                });
+
+                // Add to notification button container
+                const notificationContainer = notificationBtn.parentNode;
+                notificationContainer.style.position = 'relative';
+                notificationContainer.appendChild(notificationDropdown);
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function closeDropdown(e) {
+                    if (!notificationContainer.contains(e.target)) {
+                        notificationDropdown.style.display = 'none';
+                        document.removeEventListener('click', closeDropdown);
+                    }
+                });
+
+                // Update notification badge
+                updateNotificationBadge(notifications.filter(n => !n.read).length);
+            }
+
+            // Get notification color based on type
+            function getNotificationColor(type) {
+                const colors = {
+                    update: 'var(--brand)',
+                    comment: 'var(--warn)',
+                    test: 'var(--danger)',
+                    resolved: 'var(--ok)',
+                    report: 'var(--brand-2)'
+                };
+                return colors[type] || 'var(--muted)';
+            }
+
+            // Handle notification click
+            function handleNotificationClick(notification) {
+                console.log('Notification clicked:', notification);
+                alert(`Notification: ${notification.title}\n\n${notification.message}\n\n(This would navigate to the relevant page in a real app)`);
+            }
+
+            // Update notification badge
+            function updateNotificationBadge(count) {
+                const badge = document.querySelector('.notification-badge');
+                if (badge) {
+                    if (count > 0) {
+                        badge.textContent = count > 99 ? '99+' : count;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

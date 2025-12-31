@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cases - BugTracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0b1020;
+            --panel: #0f1528;
+            --muted: #9aa3b2;
+            --text: #e6ecf5;
+            --brand: #6aa6ff;
+            --brand-2: #8b5cf6;
+            --ok: #22c55e;
+            --warn: #f59e0b;
+            --danger: #ef4444;
+            --radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--panel);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+        }
+
+        .sidebar-logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            font-size: 18px;
+        }
+
+        .user-details h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .user-details p {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 0 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--muted);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(106, 166, 255, 0.1);
+            color: var(--brand);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--danger);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .create-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(106, 166, 255, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .icon-total {
+            background: rgba(106, 166, 255, 0.1);
+            color: var(--brand);
+        }
+
+        .icon-passed {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--ok);
+        }
+
+        .icon-failed {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .icon-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warn);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .filters-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: rgba(106, 166, 255, 0.1);
+            color: var(--brand);
+            border-color: var(--brand);
+        }
+
+        .test-cases-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .test-case-card {
+            background: var(--panel);
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .test-case-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: rgba(106, 166, 255, 0.2);
+        }
+
+        .test-case-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .test-case-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .test-case-id {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .test-case-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-passed {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--ok);
+        }
+
+        .status-failed {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warn);
+        }
+
+        .status-not-run {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--muted);
+        }
+
+        .test-case-description {
+            margin-bottom: 15px;
+            color: var(--muted);
+        }
+
+        .test-case-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .test-case-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .test-case-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .test-case-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-run {
+            background: rgba(106, 166, 255, 0.1);
+            color: var(--brand);
+        }
+
+        .btn-run:hover {
+            background: rgba(106, 166, 255, 0.2);
+        }
+
+        .btn-view {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--muted);
+        }
+
+        .btn-view:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-edit {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warn);
+        }
+
+        .btn-edit:hover {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .test-case-priority {
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .priority-medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warn);
+        }
+
+        .priority-low {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--ok);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-logo-text, .user-details, .nav-text {
+                display: none;
+            }
+
+            .sidebar-header {
+                padding: 15px 10px;
+            }
+
+            .sidebar-logo {
+                justify-content: center;
+            }
+
+            .user-info {
+                justify-content: center;
+            }
+
+            .nav-item {
+                justify-content: center;
+                padding: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .test-case-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .test-case-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .test-case-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">BT</div>
+                    <div class="sidebar-logo-text">BugTracker</div>
+                </div>
+
+                <div class="user-info">
+                    <div class="user-avatar">MT</div>
+                    <div class="user-details">
+                        <h3>Mike Tester</h3>
+                        <p>Tester</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-menu">
+                <a href="tester-dashboard.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="Bug-Detail-Page.html" class="nav-item">
+                    <i class="fas fa-bug"></i>
+                    <span class="nav-text">Reported Bugs</span>
+                </a>
+                <a href="test-cases.html" class="nav-item active">
+                    <i class="fas fa-list"></i>
+                    <span class="nav-text">Test Cases</span>
+                </a>
+                <a href="tester-reports.html" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="nav-text">Reports</span>
+                </a>
+            </div>
+
+            <div class="sidebar-footer">
+                <a href="#" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="page-title">Test Cases</h1>
+
+                <div class="header-actions">
+                    <a href="#" class="create-btn" onclick="alert('Create Test Case feature coming soon!')">
+                        <i class="fas fa-plus"></i>
+                        Create Test Case
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Total Test Cases</div>
+                        <div class="stat-icon icon-total">
+                            <i class="fas fa-list"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">24</div>
+                    <div class="stat-change">+3 this week</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Passed</div>
+                        <div class="stat-icon icon-passed">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">18</div>
+                    <div class="stat-change">75% pass rate</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Failed</div>
+                        <div class="stat-icon icon-failed">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-change">12.5% fail rate</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Pending</div>
+                        <div class="stat-icon icon-pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-change">12.5% pending</div>
+                </div>
+            </div>
+
+            <!-- Filters and Actions -->
+            <div class="filters-actions">
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterTestCases('all')">All Tests</button>
+                    <button class="filter-btn" onclick="filterTestCases('passed')">Passed</button>
+                    <button class="filter-btn" onclick="filterTestCases('failed')">Failed</button>
+                    <button class="filter-btn" onclick="filterTestCases('pending')">Pending</button>
+                    <button class="filter-btn" onclick="filterTestCases('not-run')">Not Run</button>
+                </div>
+            </div>
+
+            <!-- Test Cases List -->
+            <div class="test-cases-list">
+                <div class="test-case-card">
+                    <div class="test-case-header">
+                        <div>
+                            <h3 class="test-case-title">User Login Functionality</h3>
+                            <div class="test-case-id">#TC-001</div>
+                        </div>
+                        <div class="test-case-status status-passed">Passed</div>
+                    </div>
+
+                    <p class="test-case-description">Verify that users can successfully log in with valid credentials and are redirected to the dashboard.</p>
+
+                    <div class="test-case-meta">
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span class="test-case-priority priority-high">High Priority</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Last Run: 2 days ago</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Duration: 45s</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-folder"></i>
+                            <span>Authentication Module</span>
+                        </div>
+                    </div>
+
+                    <div class="test-case-footer">
+                        <div class="test-case-actions">
+                            <button class="action-btn btn-run" onclick="runTestCase('TC-001')">
+                                <i class="fas fa-play"></i> Run Test
+                            </button>
+                            <button class="action-btn btn-view" onclick="viewTestCase('TC-001')">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                            <button class="action-btn btn-edit" onclick="editTestCase('TC-001')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-case-card">
+                    <div class="test-case-header">
+                        <div>
+                            <h3 class="test-case-title">Password Reset Flow</h3>
+                            <div class="test-case-id">#TC-002</div>
+                        </div>
+                        <div class="test-case-status status-failed">Failed</div>
+                    </div>
+
+                    <p class="test-case-description">Test the complete password reset process including email verification and new password setup.</p>
+
+                    <div class="test-case-meta">
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span class="test-case-priority priority-high">High Priority</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Last Run: 1 day ago</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Duration: 2m 15s</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-folder"></i>
+                            <span>Authentication Module</span>
+                        </div>
+                    </div>
+
+                    <div class="test-case-footer">
+                        <div class="test-case-actions">
+                            <button class="action-btn btn-run" onclick="runTestCase('TC-002')">
+                                <i class="fas fa-play"></i> Run Test
+                            </button>
+                            <button class="action-btn btn-view" onclick="viewTestCase('TC-002')">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                            <button class="action-btn btn-edit" onclick="editTestCase('TC-002')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-case-card">
+                    <div class="test-case-header">
+                        <div>
+                            <h3 class="test-case-title">Dashboard Data Loading</h3>
+                            <div class="test-case-id">#TC-003</div>
+                        </div>
+                        <div class="test-case-status status-passed">Passed</div>
+                    </div>
+
+                    <p class="test-case-description">Verify that dashboard loads all required data within acceptable time limits and displays correctly.</p>
+
+                    <div class="test-case-meta">
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span class="test-case-priority priority-medium">Medium Priority</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Last Run: 3 days ago</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Duration: 1m 30s</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-folder"></i>
+                            <span>Dashboard Module</span>
+                        </div>
+                    </div>
+
+                    <div class="test-case-footer">
+                        <div class="test-case-actions">
+                            <button class="action-btn btn-run" onclick="runTestCase('TC-003')">
+                                <i class="fas fa-play"></i> Run Test
+                            </button>
+                            <button class="action-btn btn-view" onclick="viewTestCase('TC-003')">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                            <button class="action-btn btn-edit" onclick="editTestCase('TC-003')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-case-card">
+                    <div class="test-case-header">
+                        <div>
+                            <h3 class="test-case-title">Bug Report Submission</h3>
+                            <div class="test-case-id">#TC-004</div>
+                        </div>
+                        <div class="test-case-status status-pending">Pending</div>
+                    </div>
+
+                    <p class="test-case-description">Test the bug reporting form validation and successful submission with all required fields.</p>
+
+                    <div class="test-case-meta">
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span class="test-case-priority priority-high">High Priority</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Last Run: 5 days ago</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Duration: 3m 45s</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-folder"></i>
+                            <span>Bug Tracking Module</span>
+                        </div>
+                    </div>
+
+                    <div class="test-case-footer">
+                        <div class="test-case-actions">
+                            <button class="action-btn btn-run" onclick="runTestCase('TC-004')">
+                                <i class="fas fa-play"></i> Run Test
+                            </button>
+                            <button class="action-btn btn-view" onclick="viewTestCase('TC-004')">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                            <button class="action-btn btn-edit" onclick="editTestCase('TC-004')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-case-card">
+                    <div class="test-case-header">
+                        <div>
+                            <h3 class="test-case-title">User Profile Update</h3>
+                            <div class="test-case-id">#TC-005</div>
+                        </div>
+                        <div class="test-case-status status-not-run">Not Run</div>
+                    </div>
+
+                    <p class="test-case-description">Verify that users can update their profile information and changes are saved correctly.</p>
+
+                    <div class="test-case-meta">
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span class="test-case-priority priority-low">Low Priority</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Never run</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Duration: N/A</span>
+                        </div>
+                        <div class="test-case-meta-item">
+                            <i class="fas fa-folder"></i>
+                            <span>User Management</span>
+                        </div>
+                    </div>
+
+                    <div class="test-case-footer">
+                        <div class="test-case-actions">
+                            <button class="action-btn btn-run" onclick="runTestCase('TC-005')">
+                                <i class="fas fa-play"></i> Run Test
+                            </button>
+                            <button class="action-btn btn-view" onclick="viewTestCase('TC-005')">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                            <button class="action-btn btn-edit" onclick="editTestCase('TC-005')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterTestCases(filterType) {
+            const testCaseCards = document.querySelectorAll('.test-case-card');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+
+            // Remove active class from all filter buttons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            testCaseCards.forEach(card => {
+                const testStatus = card.querySelector('.test-case-status').textContent.trim().toLowerCase().replace(' ', '-');
+                let showCard = false;
+
+                switch(filterType) {
+                    case 'all':
+                        showCard = true;
+                        break;
+                    case 'passed':
+                        showCard = testStatus === 'passed';
+                        break;
+                    case 'failed':
+                        showCard = testStatus === 'failed';
+                        break;
+                    case 'pending':
+                        showCard = testStatus === 'pending';
+                        break;
+                    case 'not-run':
+                        showCard = testStatus === 'not-run';
+                        break;
+                }
+
+                card.style.display = showCard ? 'block' : 'none';
+            });
+        }
+
+        function runTestCase(testId) {
+            alert(`Running test case ${testId}. This feature is not fully implemented yet.`);
+        }
+
+        function viewTestCase(testId) {
+            alert(`Viewing details for test case ${testId}. This feature is not fully implemented yet.`);
+        }
+
+        function editTestCase(testId) {
+            alert(`Editing test case ${testId}. This feature is not fully implemented yet.`);
+        }
+    </script>
+</body>
+</html>

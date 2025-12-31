@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register • Bug Tracker</title>
+    <style>
+        :root{
+            --bg:#0b1020;          /* deep navy */
+            --panel:#0f1528;       /* card bg */
+            --muted:#9aa3b2;       /* text muted */
+            --text:#e6ecf5;        /* text */
+            --brand:#6aa6ff;       /* primary */
+            --brand-2:#8b5cf6;     /* accent */
+            --ok:#22c55e;          /* success */
+            --warn:#f59e0b;        /* warning */
+            --danger:#ef4444;      /* danger */
+            --radius:16px;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            height: 100%;
+            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: radial-gradient(1200px 800px at 20% -10%, #1a2444 0%, transparent 60%),
+                        radial-gradient(800px 500px at 120% 10%, #2a1f55 0%, transparent 50%),
+                        linear-gradient(180deg, #0b1020, #0b1020 70%);
+            color: var(--text);
+            line-height: 1.55;
+            overflow-x: hidden;
+        }
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+        .register-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            filter: blur(40px);
+        }
+        .shape-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--brand);
+            top: -100px;
+            right: -100px;
+        }
+        .shape-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--brand-2);
+            bottom: -50px;
+            left: -50px;
+        }
+        .register-card {
+            background: var(--panel);
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            width: 100%;
+            max-width: 700px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .register-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+        .register-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--brand), var(--brand-2));
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(106, 166, 255, 0.25);
+        }
+        .logo span {
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+        }
+        .nav {
+            display: flex;
+            gap: 10px;
+        }
+        .nav a {
+            color: var(--muted);
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .nav a:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+        }
+        .register-form {
+            display: grid;
+            gap: 20px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--muted);
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+        }
+        .input-field, .select-field {
+            width: 100%;
+            padding: 14px 14px 14px 45px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text);
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        .select-field {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239aa3b2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+        .input-field:focus, .select-field:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(106, 166, 255, 0.15);
+        }
+        .input-field::placeholder {
+            color: var(--muted);
+        }
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+        }
+        .password-strength {
+            margin-top: 8px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+        .password-strength-meter {
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+        .strength-weak {
+            background: var(--danger);
+            width: 33%;
+        }
+        .strength-medium {
+            background: var(--warn);
+            width: 66%;
+        }
+        .strength-strong {
+            background: var(--ok);
+            width: 100%;
+        }
+        .strength-text {
+            font-size: 12px;
+            margin-top: 5px;
+            color: var(--muted);
+        }
+        .role-description {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 5px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--brand);
+        }
+        .register-button {
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            border: none;
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(106, 166, 255, 0.2);
+            margin-top: 10px;
+        }
+        .register-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px rgba(106, 166, 255, 0.3);
+        }
+        .register-button:active {
+            transform: translateY(0);
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+        .login-link a {
+            color: var(--brand);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+        .login-link a:hover {
+            color: var(--brand-2);
+        }
+        .terms {
+            font-size: 12px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 15px;
+        }
+        .terms a {
+            color: var(--brand);
+            text-decoration: none;
+        }
+        .terms a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-background">
+            <div class="floating-shape shape-1"></div>
+            <div class="floating-shape shape-2"></div>
+        </div>
+        
+        <div class="register-card">
+            <div class="header">
+                <div class="brand">
+                    <div class="logo"><span>BT</span></div>
+                    <div>
+                        <div class="title">Create Account</div>
+                        <div class="subtitle">Join our bug tracking platform</div>
+                    </div>
+                </div>
+                <div class="nav">
+                    <a href="/landing.html">Home</a>
+                    
+                </div>
+            </div>
+            
+            <form id="regForm" class="register-form" method="POST" action="/register" novalidate>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon">👤</div>
+                        <input type="text" id="username" name="username" class="input-field" placeholder="Choose a username" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon">🔒</div>
+                        <input type="password" id="password" name="password" class="input-field" placeholder="Min 6 characters" minlength="6" required>
+
+                    </div>
+                    
+                </div>
+                
+                <div class="form-group">
+                    <label for="role">Select Role</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon">👔</div>
+                        <select id="role" name="role" class="select-field" required>
+                            <option value="">Select a role</option>
+                            <option value="tester">Tester</option>
+                            <option value="developer">Developer</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="role-description" id="roleDescription">
+                        Select your role to continue. Testers report bugs, developers fix them.
+                    </div>
+                </div>
+                
+                <button type="submit" class="register-button">Create Account</button>
+                
+                
+            </form>
+            
+            <div class="login-link">
+                Already have an account? <a href="login.html">Sign in</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        const passwordToggle = document.querySelector('.password-toggle');
+        const passwordField = document.getElementById('password');
+
+        passwordToggle.addEventListener('click', () => {
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordToggle.textContent = '🔓';
+            } else {
+                passwordField.type = 'password';
+                passwordToggle.textContent = '👁️';
+            }
+        });
+        
+        // Role description
+        const roleSelect = document.getElementById('role');
+        const roleDescription = document.getElementById('roleDescription');
+        
+        roleSelect.addEventListener('change', function() {
+            if (this.value === 'tester') {
+                roleDescription.textContent = 'As a Tester, you will be responsible for finding and reporting bugs in the system. You can create detailed bug reports and track their status.';
+            } else if (this.value === 'developer') {
+                roleDescription.textContent = 'As a Developer, you will be assigned bugs to fix. You can update bug status, add comments, and mark bugs as resolved.';
+            } else {
+                roleDescription.textContent = 'Select your role to continue. Testers report bugs, developers fix them.';
+            }
+        });
+        
+        // Form submission - let it submit normally to Flask backend
+        const regForm = document.getElementById('regForm');
+        regForm.addEventListener('submit', (e) => {
+            // Basic client-side validation
+            const password = document.getElementById('password').value;
+
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('Password must be at least 6 characters long!');
+                return;
+            }
+        });
+    </script>
+</body>
+</html>
