@@ -6,6 +6,21 @@ Roll No: 209
 Class: B.Tech CSE-B  
 Academic Year: 2025–26  
 
+Name: Yogeshwari Lomte 
+Roll No:205  
+Class: B.Tech CSE-B  
+Academic Year: 2025–26  
+
+Name:Aarti Lakade
+Roll No: 202
+Class: B.Tech CSE-B  
+Academic Year: 2025–26  
+
+Name: Shashank Gadhe 
+Roll No: 216 
+Class: B.Tech CSE-B  
+Academic Year: 2025–26  
+
 ## Project Title
 Bug Tracking and Issue Management System
 
